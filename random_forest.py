@@ -17,13 +17,10 @@ X = df.drop(columns='Activity')
 Y = df['Activity']
 
 # Dividi il dataset
-X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.20, random_state=35)
-
-# Numero massimo di nodi per albero
-max_nodes_per_tree = 128 // 4
+X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.20, random_state=150)
 
 # Addestramento Random Forest
-random_forest = RandomForestClassifier(n_estimators=4, max_leaf_nodes=max_nodes_per_tree, random_state=42)
+random_forest = RandomForestClassifier(n_estimators=150, random_state=150)
 
 print('Fit Random Forest')
 random_forest.fit(X_train, y_train)
@@ -37,6 +34,9 @@ print(f'Accuracy: {accuracy}')
 report = classification_report(y_test, y_pred)
 print(f'Classification Report:\n{report}')
 
+print('Confusion Matrix:')
+print(confusion_matrix(y_test, y_pred))
+
 # Converte il modello in formato ONNX
 initial_type = [('float_input', FloatTensorType([None, X.shape[1]]))]
 onnx_model = convert_sklearn(random_forest, initial_types=initial_type)
@@ -44,10 +44,6 @@ onnx_model = convert_sklearn(random_forest, initial_types=initial_type)
 # Salva il modello in formato ONNX
 with open('random_forest.onnx', 'wb') as file:
     file.write(onnx_model.SerializeToString())
-    
-# Salva il modello in formato pickle
-with open('random_forest.pkl', 'wb') as file:
-    pickle.dump(random_forest, file)
 
 # Stampo la matrice di confusione per le 4 classi: driving, running, stationary, walking
 cm = confusion_matrix(y_test, y_pred)
@@ -59,18 +55,26 @@ plt.ylabel('Valori reali')
 plt.title('Matrice di Confusione Random Forest')
 plt.show()
 
-
 # Output:
 
-# Accuracy: 0.9536679536679536
+# 150 trees random state 150
+# random state train test split 150
+
+# Accuracy: 0.9826254826254827
 # Classification Report:
 #               precision    recall  f1-score   support
 
-#      Driving       0.97      0.97      0.97       219
-#      Running       0.98      1.00      0.99        47
-#   Stationary       0.94      0.86      0.90       109
-#      Walking       0.93      0.98      0.95       143
+#      Driving       1.00      1.00      1.00       215
+#      Running       1.00      1.00      1.00        61
+#   Stationary       0.98      0.96      0.97       128
+#      Walking       0.96      0.97      0.97       114
 
-#     accuracy                           0.95       518
-#    macro avg       0.95      0.95      0.95       518
-# weighted avg       0.95      0.95      0.95       518
+#     accuracy                           0.98       518
+#    macro avg       0.98      0.98      0.98       518
+# weighted avg       0.98      0.98      0.98       518
+
+# Confusion Matrix:
+# [[214   0   0   1]
+#  [  0  61   0   0]
+#  [  1   0 123   4]
+#  [  0   0   3 111]]
