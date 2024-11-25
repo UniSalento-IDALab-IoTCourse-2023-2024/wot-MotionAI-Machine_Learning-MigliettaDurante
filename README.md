@@ -22,6 +22,7 @@ tali file sono stati ottenuti dalla repository presente al seguente link: [STMic
 - Python 3.x
 - pandas
 - scikit-learn
+- numpy
 - matplotlib
 - seaborn
 
