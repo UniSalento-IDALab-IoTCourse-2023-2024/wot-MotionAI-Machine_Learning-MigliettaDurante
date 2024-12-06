@@ -1,5 +1,5 @@
 import pandas as pd
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, LeaveOneOut, cross_val_score
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from skl2onnx import convert_sklearn
@@ -19,6 +19,12 @@ X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.20, random
 
 # Addestramento Random Forest
 random_forest = RandomForestClassifier(n_estimators=150, random_state=150)
+
+# Leave One Out Cross Validation
+loo = LeaveOneOut()
+cv_scores = cross_val_score(random_forest, X, Y, cv=loo)
+print(f'Leave-One-Out Cross Validation Accuracy Mean: {cv_scores.mean()}')
+print(f'Leave-One-Out Cross Validation Accuracy Variance: {cv_scores.var()}')
 
 print('Fit Random Forest')
 random_forest.fit(X_train, y_train)
@@ -54,6 +60,9 @@ plt.title('Matrice di Confusione Random Forest')
 plt.show()
 
 # Output:
+
+# Leave-One-Out Cross Validation Accuracy: 0.9745173745173745
+# Leave-One-Out Cross Validation Accuracy Variance: 0.02483326128113773
 
 # 150 trees random state 150
 # random state train test split 150
